@@ -5,6 +5,8 @@ require __DIR__ . "/vendor/autoload.php";
 
 ## CONNECTEZ VOUS A VOTRE BASE DE DONNEE
 
+$pdo = new PDO('mysql:host=localhost;dbname=bddrendus3php', "root", "root");
+
 ## ETAPE 1
 
 ## RECUPERER TOUT LES PERSONNAGES CONTENU DANS LA TABLE personnages
@@ -27,7 +29,10 @@ require __DIR__ . "/vendor/autoload.php";
 # AFFICHER LE MSG "PERSONNAGE ($name) A GAGNER UNE ETOILES"
 
 ?>
-
+<?php
+$query = $pdo->prepare("SELECT * FROM `personnages`");
+$query->execute();
+?>
 
 <!doctype html>
 <html lang="en">
@@ -47,8 +52,29 @@ require __DIR__ . "/vendor/autoload.php";
     <a href="./combat.php" class="nav-link">Combats</a>
 </nav>
 <h1>Mes personnages</h1>
-<div class="w-100 mt-5">
 
+<div class="w-100 mt-5">
+    <p>Nom ATK PV type_id Etoiles</p><br>
+    <?php
+    while ($type = $query->fetch()) {?>
+        <?php
+        if(isset($_POST['star'.$type['id']])){
+
+            $type['stars']++;
+            $queryUpdate = $pdo->prepare("UPDATE `personnages` SET stars = :stars WHERE `name` = :`name`");
+            $queryUpdate->execute(["stars"=>$type["stars"], "name"=>$type["name"]]);
+            echo $type["name"]." a gagné 1 étoile";
+
+        }
+        ?>
+    <p> <?= $type['name']; ?> <?= $type['atk']; ?> <?= $type['pv']; ?> <?= $type['type_id']; ?> <?= $type['stars']; ?>
+
+        <form action="" method="POST">
+            <button name="star<?=$type['id']?>">Stars</button>
+        </form></p>
+
+    <?php
+    }?>
 </div>
 
 </body>

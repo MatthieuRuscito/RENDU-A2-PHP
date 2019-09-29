@@ -5,6 +5,8 @@ require __DIR__ . "/vendor/autoload.php";
 
 ## CONNECTEZ VOUS A VOTRE BASE DE DONNEE
 
+$pdo = new PDO('mysql:host=localhost;dbname=bddrendus3php', "root", "root");
+
 ### ETAPE 1
 
 ####CREE UNE BASE DE DONNEE AVEC UNE TABLE PERSONNAGE, UNE TABLE TYPE
@@ -54,7 +56,14 @@ require __DIR__ . "/vendor/autoload.php";
 # ENREGISTRER 5 / 6 PERSONNAGE DIFFERENT
 
 ?>
+<?php
+if (!empty($_POST)){
+    $nvPerso = $pdo->prepare("INSERT INTO `personnages`(`name`, `atk`, `pv`, `type_id`, `stars`) VALUES (?, ?, ?, ?, ?)");
+    $nvPerso->execute(array($_POST['nom'], $_POST['attaque'], $_POST['pv'], $_POST['type_id'], '1'));
+    $messagePerso = "Personnage ".$_POST['nom']." créé";
+};
 
+?>
 
 <!doctype html>
 <html lang="en">
@@ -78,25 +87,36 @@ require __DIR__ . "/vendor/autoload.php";
     <form action="" method="POST" class="form-group">
         <div class="form-group col-md-4">
             <label for="">Nom du personnage</label>
-            <input type="text" class="form-control" placeholder="Nom">
+            <input type="text" class="form-control" name="nom" id="nom" placeholder="Nom">
         </div>
 
         <div class="form-group col-md-4">
             <label for="">Attaque du personnage</label>
-            <input type="text" class="form-control" placeholder="Atk">
+            <input type="text" class="form-control" name="attaque" id="attaque" placeholder="Atk">
         </div>
         <div class="form-group col-md-4">
             <label for="">Pv du personnage</label>
-            <input type="text" class="form-control" placeholder="Pv">
+            <input type="text" class="form-control" name="pv" id="pv" placeholder="Pv">
         </div>
         <div class="form-group col-md-4">
             <label for="">Type</label>
-            <select name="" id="">
+            <select name="type_id" id="type_id">
                 <option value="" selected disabled>Choissisez un type</option>
+                <?php
+                $query = $pdo->query('SELECT * FROM `types`');
+                while ($type = $query->fetch()) {?>
+                    <option value="<?= $type['id']; ?>"> <?= $type['name']; ?></option>
+                    <?php
+                }?>
             </select>
         </div>
         <button class="btn btn-primary">Enregistrer</button>
     </form>
+    <?php
+    if(isset($messagePerso)){
+        echo $messagePerso;
+    };
+    ?>
 </div>
 
 </body>
